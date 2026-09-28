@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+/dist/
+/build/
+/.next/
+/out/
+/.nuxt/
+/.cache/
+/.parcel-cache/
+**/dist/
+**/build/
+**/.next/
+**/coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Package manager lockfiles (optional if you want to commit them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Uploads / generated assets (uncomment if project stores uploads in repo)
+# uploads/
+# public/uploads/
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
