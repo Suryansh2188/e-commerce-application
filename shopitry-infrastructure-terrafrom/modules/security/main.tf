@@ -135,7 +135,7 @@ resource "aws_vpc_security_group_ingress_rule" "catalog" {
   from_port = 5001
   to_port   = 5001
 
-  cidr_ipv4 = aws_security_group.public_services.id
+  referenced_security_group_id = aws_security_group.public_services.id
 }
 
 
@@ -150,7 +150,7 @@ resource "aws_vpc_security_group_ingress_rule" "cart" {
   from_port = 5002
   to_port   = 5002
 
-  cidr_ipv4 = aws_security_group.public_services.id
+  referenced_security_group_id = aws_security_group.public_services.id
 }
 
 
@@ -165,7 +165,7 @@ resource "aws_vpc_security_group_ingress_rule" "order" {
   from_port = 5003
   to_port   = 5003
 
-  cidr_ipv4 = aws_security_group.public_services.id
+  referenced_security_group_id = aws_security_group.public_services.id
 }
 
 
