@@ -1,0 +1,5 @@
+---
+service_name: cart-service
+service_user: cart
+service_dir: /opt/cart-service
+service_port: 5002

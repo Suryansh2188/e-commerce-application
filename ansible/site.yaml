@@ -1,0 +1,36 @@
+---
+- name: Deploy Gateway
+  hosts: gateway
+  become: true
+  roles:
+    - gateway
+
+- name: Deploy Catalog
+  hosts: catalog
+  become: true
+  roles:
+    - catalog
+
+- name: Deploy Cart
+  hosts: cart
+  become: true
+  roles:
+    - cart
+
+- name: Deploy Order
+  hosts: order
+  become: true
+  roles:
+    - order
+
+- name: Deploy Payment
+  hosts: payment
+  become: true
+  roles:
+    - payment
+
+- name: Deploy Notification
+  hosts: notification
+  become: true
+  roles:
+    - notification
