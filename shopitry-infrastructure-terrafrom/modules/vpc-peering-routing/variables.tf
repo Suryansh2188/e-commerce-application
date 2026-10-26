@@ -26,3 +26,7 @@ variable "public_sg_id" {
 variable "private_sg_id" {
   type = string
 }
+
+variable "default_vpc_cidr" {
+  type = string
+}

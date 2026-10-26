@@ -29,20 +29,14 @@ resource "aws_route" "to_peer_vpc" {
 # Microservices private route table entry
 resource "aws_route" "private_rt" {
   route_table_id = var.private_rt_id
-  destination_cidr_block = format(
-    "%s/32",
-    data.aws_instance.existing.public_ip
-  )
+  destination_cidr_block = var.default_vpc_cidr
   vpc_peering_connection_id = var.vpc_peering_connection_id
 }
 
 # API Gateway public route table entry
 resource "aws_route" "public_rt" {
   route_table_id = var.public_rt_id
-  destination_cidr_block = format(
-    "%s/32",
-    data.aws_instance.existing.public_ip
-  )
+  destination_cidr_block = var.default_vpc_cidr
   vpc_peering_connection_id = var.vpc_peering_connection_id
 }
 
@@ -59,7 +53,7 @@ resource "aws_vpc_security_group_ingress_rule" "public_sg" {
 
   cidr_ipv4 = format(
     "%s/32",
-    data.aws_instance.existing.public_ip
+    data.aws_instance.existing.private_ip
   )
 }
 
@@ -76,6 +70,6 @@ resource "aws_vpc_security_group_ingress_rule" "private_sg" {
 
   cidr_ipv4 = format(
     "%s/32",
-    data.aws_instance.existing.public_ip
+    data.aws_instance.existing.private_ip
   )
 }

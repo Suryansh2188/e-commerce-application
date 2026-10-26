@@ -96,6 +96,7 @@ module "vpc_peering_routing" {
 
   instance_id               = var.instance_id
   peer_vpc_cidr             = var.vpc_cidr
+  default_vpc_cidr = data.aws_vpc.default.cidr_block
   vpc_peering_connection_id = module.vpc_peering.vpc_peering_connection_id
 
   public_rt_id = module.network.public_rt_id
