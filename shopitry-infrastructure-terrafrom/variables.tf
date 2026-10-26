@@ -50,6 +50,10 @@ variable "key_name" {
   type        = string
 }
 
+variable "instance_id" {
+  description = "Control plan EC2 instance id"
+  type = string
+}
 
 # variable "public_subnet_id" {
 #   description = "Public subnet ID"

@@ -45,3 +45,13 @@ output "notification_function_url" {
 output "notification_lambda_function_arn" {
   value = module.lambda_functions.notification_lambda_function_arn
 }
+
+output "vpc_peering_connection_id" {
+  description = "ID of the VPC peering connection."
+  value       = module.vpc_peering.vpc_peering_connection_id
+}
+
+output "vpc_peering_connection_status" {
+  description = "Status of the VPC peering connection request."
+  value       = module.vpc_peering.vpc_peering_connection_status
+}

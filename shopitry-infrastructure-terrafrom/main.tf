@@ -77,6 +77,34 @@ module "lambda_functions" {
   aws_region = var.aws_region
 }
 
+# Fetch the default VPC for the current region
+data "aws_vpc" "default" {
+  default = true
+}
+
+module "vpc_peering" {
+  source       = "./modules/vpc-peering"
+  project_name = var.project_name
+
+  requester_vpc_id = data.aws_vpc.default.id
+  peer_vpc_id      = module.network.vpc_id
+}
+
+
+module "vpc_peering_routing" {
+  source = "./modules/vpc-peering-routing"
+
+  instance_id               = var.instance_id
+  peer_vpc_cidr             = var.vpc_cidr
+  vpc_peering_connection_id = module.vpc_peering.vpc_peering_connection_id
+
+  public_rt_id = module.network.public_rt_id
+  private_rt_id = module.network.private_rt_id
+
+  public_sg_id = module.security.public_services_security_group_id
+  private_sg_id = module.security.private_services_security_group_id
+}
+
 
 
 resource "local_file" "terraform_outputs" {
