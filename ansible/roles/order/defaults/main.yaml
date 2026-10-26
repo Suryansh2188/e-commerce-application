@@ -1,0 +1,5 @@
+---
+service_name: order-service
+service_user: order
+service_dir: /opt/order-service
+service_port: 5003

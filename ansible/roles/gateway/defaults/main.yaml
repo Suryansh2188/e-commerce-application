@@ -1,0 +1,5 @@
+---
+service_name: gateway-service
+service_user: gateway
+service_dir: /opt/gateway-service
+service_port: 5000

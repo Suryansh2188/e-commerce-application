@@ -1,0 +1,5 @@
+---
+service_name: catalog-service
+service_user: catalog
+service_dir: /opt/catalog-service
+service_port: 5001

@@ -1,0 +1,62 @@
+
+---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install Node.js and npm
+  ansible.builtin.apt:
+    name:
+      - nodejs
+      - npm
+    state: present
+
+- name: Install PM2 globally
+  community.general.npm:
+    name: pm2
+    global: true
+    state: present
+
+- name: Create API-gateway application directory
+  ansible.builtin.file:
+    path: /opt/gateway-service
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Copy API-gateway microservice from Ansible machine
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../backend/gateway-service/"
+    dest: /opt/gateway-service/
+    owner: root
+    group: root
+    mode: preserve
+
+- name: Install production dependencies
+  ansible.builtin.command: npm ci --omit=dev
+  args:
+    chdir: /opt/gateway-service
+  become: true
+  become_user: root
+
+- name: Create API-gateway environment file
+  ansible.builtin.template:
+    src: app.env.j2
+    dest: /opt/gateway-service/.env
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Start API-gateway with PM2 as root
+  ansible.builtin.shell: |
+    if pm2 describe gateway-service >/dev/null 2>&1; then
+      pm2 restart gateway-service
+    else
+      pm2 start src/index.js --name gateway-service
+    fi
+    pm2 save
+  args:
+    chdir: /opt/gateway-service
+  become: true
+  become_user: root
