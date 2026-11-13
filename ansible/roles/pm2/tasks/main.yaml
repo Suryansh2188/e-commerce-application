@@ -1,0 +1,15 @@
+---
+- name: Install PM2 globally
+  community.general.npm:
+    name: pm2
+    global: yes
+    state: present
+
+- name: Check PM2 version
+  ansible.builtin.command: pm2 --version
+  register: pm2_version
+  changed_when: false
+
+- name: Display PM2 version
+  ansible.builtin.debug:
+    msg: "Installed PM2 version: {{ pm2_version.stdout }}"

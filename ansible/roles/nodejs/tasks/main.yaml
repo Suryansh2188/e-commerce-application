@@ -1,0 +1,30 @@
+
+---
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/setup_22.x
+    dest: /tmp/nodesource_setup.sh
+    mode: '0755'
+
+- name: Configure NodeSource repository
+  ansible.builtin.command:
+    cmd: bash /tmp/nodesource_setup.sh
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install Node.js and npm
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+
+- name: Check Node.js version
+  ansible.builtin.command: node --version
+  register: node_version
+  changed_when: false
+
+- name: Display Node.js version
+  ansible.builtin.debug:
+    msg: "Installed Node.js version: {{ node_version.stdout }}"

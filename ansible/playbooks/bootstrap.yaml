@@ -1,0 +1,9 @@
+---
+- name: Bootstrap ShopiTry EC2 Instances
+  hosts: app_servers
+  become: true
+
+  roles:
+    - common
+    - nodejs
+    - pm2
