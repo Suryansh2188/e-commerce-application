@@ -25,7 +25,7 @@ pipeline{
 
         stage("change-directory-stage"){
             steps{
-                dir('edublitz-e-commerce-application-shopitry/shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terrafrom') {
                     sh 'cp terraform.tfvars.example terraform.tfvars'
                 }
             }
@@ -45,7 +45,7 @@ pipeline{
 
         stage("terraform-init-stage"){
             steps{
-                dir('edublitz-e-commerce-application-shopitry/shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terrafrom') {
                     sh 'terraform init'
                 }
             }
@@ -65,7 +65,7 @@ pipeline{
 
         stage("terraform-validate-stage"){
             steps{
-                dir('edublitz-e-commerce-application-shopitry/shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terrafrom') {
                     sh 'terraform validate'
                 }
             }
@@ -85,7 +85,7 @@ pipeline{
 
         stage("terraform-plan-stage"){
             steps{
-                dir('edublitz-e-commerce-application-shopitry/shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terrafrom') {
                     sh '''
                     terraform plan \
                     -var="instance_id=${INSTANCE_ID}" \
@@ -127,7 +127,7 @@ pipeline{
 
         stage("terraform-apply-stage"){
             steps{
-                dir('edublitz-e-commerce-application-shopitry/shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terrafrom') {
                     sh '''
                     terraform apply --auto-approve \
                     -var="instance_id=${INSTANCE_ID}" \
