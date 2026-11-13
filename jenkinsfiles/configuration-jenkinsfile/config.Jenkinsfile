@@ -63,27 +63,62 @@ pipeline {
             }
         }
 
-        // stage('Configure Microservices Instance') {
-        //     steps {
-        //         dir('ansible') {
-        //             sh '''ansible-galaxy collection install community.general
-        //                   ansible-playbook playbooks/bootstrap.yaml --syntax-check
-        //                   ansible-playbook playbooks/bootstrap.yaml
-        //                '''
-        //         }
-        //     }
-        //     post {
-        //         always {
-        //             echo '====++++always++++===='
-        //         }
-        //         success {
-        //             echo '====++++Configure Microservices Instance executed successfully++++===='
-        //         }
-        //         failure {
-        //             echo '====++++Configure Microservices Instance execution failed++++===='
-        //         }
-        //     }
-        // }
+
+
+stage('Configure Microservices Instance') {
+    steps {
+        dir('ansible') {
+
+            withCredentials([
+                sshUserPrivateKey(
+                    credentialsId: 'ssh-key',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )
+            ]) {
+
+                sh '''
+                    echo "Installing Ansible collections..."
+
+                    ansible-galaxy collection install community.general
+
+                    echo "Checking Ansible playbook syntax..."
+
+                    ansible-playbook \
+                        -i inventory/inventory.ini \
+                        playbooks/bootstrap.yaml \
+                        --syntax-check \
+                        --private-key "$SSH_KEY" \
+                        -u "$SSH_USER"
+
+                    echo "Executing Ansible playbook..."
+
+                    ansible-playbook \
+                        -i inventory/inventory.ini \
+                        playbooks/bootstrap.yaml \
+                        --private-key "$SSH_KEY" \
+                        -u "$SSH_USER"
+
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo '====++++always++++===='
+        }
+
+        success {
+            echo '====++++Configure Microservices Instance executed successfully++++===='
+        }
+
+        failure {
+            echo '====++++Configure Microservices Instance execution failed++++===='
+        }
+    }
+}
+
     }
     post {
         always {
