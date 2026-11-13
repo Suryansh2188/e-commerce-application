@@ -1,4 +1,5 @@
 pipeline{
+    agent{}
     environment {
         INSTANCE_ID = 'i-0b188089b9df7ebac'
         KEY_NAME = 'uskey'
