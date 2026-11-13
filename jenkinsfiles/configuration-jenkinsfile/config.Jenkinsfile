@@ -42,7 +42,13 @@ pipeline {
 
         stage('Check Microservices Instance Connectivity') {
             steps {
-                sh './${KEY_FILE_NAME}'
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+    sh '''
+                        echo "Running connectivity script..."
+
+                        bash ./check_connectivity.sh
+                    '''
+}
             }
             post {
                 always {
@@ -57,27 +63,27 @@ pipeline {
             }
         }
 
-        stage('Configure Microservices Instance') {
-            steps {
-                dir('ansible') {
-                    sh '''ansible-galaxy collection install community.general
-                          ansible-playbook playbooks/bootstrap.yaml --syntax-check
-                          ansible-playbook playbooks/bootstrap.yaml
-                       '''
-                }
-            }
-            post {
-                always {
-                    echo '====++++always++++===='
-                }
-                success {
-                    echo '====++++Configure Microservices Instance executed successfully++++===='
-                }
-                failure {
-                    echo '====++++Configure Microservices Instance execution failed++++===='
-                }
-            }
-        }
+        // stage('Configure Microservices Instance') {
+        //     steps {
+        //         dir('ansible') {
+        //             sh '''ansible-galaxy collection install community.general
+        //                   ansible-playbook playbooks/bootstrap.yaml --syntax-check
+        //                   ansible-playbook playbooks/bootstrap.yaml
+        //                '''
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             echo '====++++always++++===='
+        //         }
+        //         success {
+        //             echo '====++++Configure Microservices Instance executed successfully++++===='
+        //         }
+        //         failure {
+        //             echo '====++++Configure Microservices Instance execution failed++++===='
+        //         }
+        //     }
+        // }
     }
     post {
         always {

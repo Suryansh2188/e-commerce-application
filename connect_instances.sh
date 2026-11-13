@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # SSH configuration
-KEY_FILE="/root/.ssh/my-key.pem"
-USERNAME="ubuntu"
+# KEY_FILE="/root/.ssh/my-key.pem"
+# USERNAME="ubuntu"
 
 # List your instance IP addresses
 INSTANCE_IPS=(
@@ -12,14 +12,20 @@ INSTANCE_IPS=(
     "10.0.2.13"
 )
 
+# Jenkins provides these variables
+if [[ -z "$SSH_KEY" ]]; then
+    echo "ERROR: SSH_KEY is not available"
+    exit 1
+fi
+
 # Check that the private key exists
-if [[ ! -f "$KEY_FILE" ]]; then
-    echo "ERROR: Private key not found: $KEY_FILE"
+if [[ ! -f "$SSH_KEY" ]]; then
+    echo "ERROR: Private key not found: $SSH_KEY"
     exit 1
 fi
 
 # Set correct key permissions
-chmod 400 "$KEY_FILE"
+chmod 400 "$SSH_KEY"
 
 # Connect to each instance
 for IP in "${INSTANCE_IPS[@]}"; do
@@ -27,7 +33,7 @@ for IP in "${INSTANCE_IPS[@]}"; do
     echo "Connecting to $IP ..."
 
     if ssh \
-        -i "$KEY_FILE" \
+        -i "$SSH_KEY" \
         -o ConnectTimeout=10 \
         -o StrictHostKeyChecking=accept-new \
         "$USERNAME@$IP" \
