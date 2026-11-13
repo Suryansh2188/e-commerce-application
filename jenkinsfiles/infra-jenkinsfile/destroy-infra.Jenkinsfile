@@ -5,7 +5,7 @@ pipeline{
         INSTANCE_ID = 'i-0b188089b9df7ebac'
         KEY_NAME = 'uskey'
     }
-    
+
     stages{
         stage("checkout-code-stage"){
             steps{
@@ -91,6 +91,7 @@ pipeline{
     post{
         always{
             echo "========always========"
+            cleanWs()
         }
         success{
             echo "========pipeline executed successfully ========"
