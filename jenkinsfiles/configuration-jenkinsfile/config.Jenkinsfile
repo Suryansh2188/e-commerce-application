@@ -46,7 +46,7 @@ pipeline {
     sh '''
                         echo "Running connectivity script..."
 
-                        bash ./check_connectivity.sh
+                        bash ./connect_instances.sh
                     '''
 }
             }
