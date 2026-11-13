@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # SSH configuration
-KEY_FILE="/root/.ssh/my-key.pem"
+KEY_FILE="$HOME/.ssh/my-key.pem"
 USERNAME="ubuntu"
 
 # List your instance IP addresses
