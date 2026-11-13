@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 
 data "archive_file" "payment" {
   type        = "zip"
-  source_dir  = "${path.root}/../backend/payment-service"
+  source_dir  = "${path.module}/lambda-placeholder/payment"
   output_path = "${path.module}/payment-service.zip"
 }
 
@@ -39,7 +39,7 @@ resource "aws_lambda_function" "payment" {
 
   role = aws_iam_role.lambda.arn
 
-  handler = "src/handler.handler"
+  handler = "index.handler"
 
   filename = data.archive_file.payment.output_path
 
@@ -84,7 +84,7 @@ resource "aws_lambda_permission" "payment_function_url" {
 
 data "archive_file" "notification" {
   type        = "zip"
-  source_dir  = "${path.root}/../backend/notification-service"
+  source_dir  = "${path.module}/lambda-placeholder/notification"
   output_path = "${path.module}/notification-service.zip"
 }
 
@@ -101,7 +101,7 @@ resource "aws_lambda_function" "notification" {
 
   role = aws_iam_role.lambda.arn
 
-  handler = "src/handler.handler"
+  handler = "index.handler"
 
   filename = data.archive_file.notification.output_path
 
