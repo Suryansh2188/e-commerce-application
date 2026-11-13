@@ -152,6 +152,7 @@ pipeline{
     post{
         always{
             echo "========always========"
+            cleanWs()
         }
         success{
             echo "========infrastructure pipeline executed successfully ========"
