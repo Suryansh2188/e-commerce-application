@@ -23,7 +23,7 @@ pipeline{
             }
         }
 
-        stage("change-directory-stage"){
+        stage("copy-tfvars-file-stage"){
             steps{
                 dir('shopitry-infrastructure-terrafrom') {
                     sh 'cp terraform.tfvars.example terraform.tfvars'
