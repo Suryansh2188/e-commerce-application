@@ -28,7 +28,7 @@ pipeline {
         stage('Deploy Gateway Microservice') {
             steps {
                 dir('ansible') {
-                    withCredentials([string(credentialsId: 'gateway-mongodb-uri', variable: 'MONGODB_URI'), sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'), string(credentialsId: 'jwt-secret-key', variable: 'JWT_SECRET_KEY')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'), string(credentialsId: 'jwt-secret-key', variable: 'JWT_SECRET_KEY')]) {
                         sh '''
                         echo "Installing Ansible collections..."
 
@@ -38,7 +38,6 @@ pipeline {
                                     -i inventory/inventory.ini \
                                      site.yaml \
                                      --limit gateway \
-                                     --extra-vars "mongodb_uri=$MONGODB_URI" \
                                      --extra-vars "jwt_secret_key=$JWT_SECRET_KEY" \
                                      --extra-vars "catalog_service_url=$CATALOG_SERVICE_URL" \
                                      --extra-vars "cart_service_url=$CART_SERVICE_URL" \
