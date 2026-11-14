@@ -54,6 +54,7 @@ pipeline {
     post {
         always {
             echo '========always========'
+            cleanWs()
         }
         success {
             echo '========catalog microservice pipeline executed successfully ========'

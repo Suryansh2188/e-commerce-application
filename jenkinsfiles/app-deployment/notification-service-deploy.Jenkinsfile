@@ -86,6 +86,7 @@ pipeline {
     post {
         always {
             echo '========always========'
+            cleanWs()
         }
         success {
             echo '========notification microservice pipeline executed successfully ========'
