@@ -17,65 +17,65 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Install Dependencies') {
-        steps {
-            dir('backend/notification-service') {
-                sh 'npm install --production'
+        stage('Install Dependencies') {
+            steps {
+                dir('backend/notification-service') {
+                    sh 'npm install --production'
+                }
+            }
+            post {
+                always {
+                    echo '====++++always++++===='
+                }
+                success {
+                    echo '====++++Install Dependencies executed successfully++++===='
+                }
+                failure {
+                    echo '====++++Install Dependencies execution failed++++===='
+                }
             }
         }
-        post {
-            always {
-                echo '====++++always++++===='
-            }
-            success {
-                echo '====++++Install Dependencies executed successfully++++===='
-            }
-            failure {
-                echo '====++++Install Dependencies execution failed++++===='
-            }
-        }
-    }
 
-    stage('Create Deployment Package Artifact') {
-        steps {
-            dir('backend/notification-service') {
-                sh 'zip -r notification-service.zip src node_modules package.json'
+        stage('Create Deployment Package Artifact') {
+            steps {
+                dir('backend/notification-service') {
+                    sh 'zip -r notification-service.zip src node_modules package.json'
+                }
+            }
+            post {
+                always {
+                    echo '====++++always++++===='
+                }
+                success {
+                    echo '====++++Create deployment package artifact executed successfully++++===='
+                }
+                failure {
+                    echo '====++++Create deployment package artifact execution failed++++===='
+                }
             }
         }
-        post {
-            always {
-                echo '====++++always++++===='
-            }
-            success {
-                echo '====++++Create deployment package artifact executed successfully++++===='
-            }
-            failure {
-                echo '====++++Create deployment package artifact execution failed++++===='
-            }
-        }
-    }
 
-    stage('Upload Artifact') {
-        steps {
-            dir('backend/notification-service') {
-                sh '''
+        stage('Upload Artifact') {
+            steps {
+                dir('backend/notification-service') {
+                    sh '''
                    aws lambda update-function-code \
                       --function-name shopitry-notification-service \
                       --zip-file fileb://notification-service.zip
                     '''
+                }
             }
-        }
-        post {
-            always {
-                echo '====++++always++++===='
-            }
-            success {
-                echo '====++++Upload Artifact executed successfully++++===='
-            }
-            failure {
-                echo '====++++Upload Artifact execution failed++++===='
+            post {
+                always {
+                    echo '====++++always++++===='
+                }
+                success {
+                    echo '====++++Upload Artifact executed successfully++++===='
+                }
+                failure {
+                    echo '====++++Upload Artifact execution failed++++===='
+                }
             }
         }
     }
