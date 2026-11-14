@@ -41,7 +41,7 @@ pipeline {
             steps {
                 dir('backend/payment-service') {
                     sh '''
-                      rm -f payment-service.zip \
+                      rm -f payment-service.zip
                       zip -r payment-service.zip src node_modules package.json
                     '''
                 }
