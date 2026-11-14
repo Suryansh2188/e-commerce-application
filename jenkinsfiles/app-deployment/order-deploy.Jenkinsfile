@@ -39,7 +39,7 @@ pipeline {
                                      --extra-vars "mongodb_uri=$MONGODB_URI" \
                                      --extra-vars "cart_service_url=$CART_SERVICE_URL" \
                                      --extra-vars "payment_lambda_function_url=$PAYMENT_SERVICE_URL" \
-                                     --extra-vars "notification_lambda_function_url=$NOTIFICATION_SERVICE_URL"
+                                     --extra-vars "notification_lambda_function_url=$NOTIFICATION_SERVICE_URL" \
                                      --private-key "$SSH_KEY" \
                                      -u "$SSH_USER"
                           '''
