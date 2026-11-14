@@ -1,22 +1,4 @@
-
 ---
-- name: Update apt package cache
-  ansible.builtin.apt:
-    update_cache: true
-
-- name: Install Node.js and npm
-  ansible.builtin.apt:
-    name:
-      - nodejs
-      - npm
-    state: present
-
-- name: Install PM2 globally
-  community.general.npm:
-    name: pm2
-    global: true
-    state: present
-
 - name: Create catalog application directory
   ansible.builtin.file:
     path: /opt/catalog-service
