@@ -66,8 +66,11 @@ pipeline {
                    aws lambda update-function-code \
                       --function-name shopitry-payment-service \
                       --zip-file fileb://payment-service.zip \
-                      --environment "Variables={PAYMENT_GATEWAY_MODE=PRODUCTION}" \
                       --publish
+
+                      aws lambda update-function-configuration \
+                         --function-name shopitry-payment-service \
+                         --environment "Variables={PAYMENT_GATEWAY_MODE=PRODUCTION}"
                     '''
                 }
             }
