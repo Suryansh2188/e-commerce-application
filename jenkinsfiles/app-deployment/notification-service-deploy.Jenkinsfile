@@ -41,7 +41,7 @@ pipeline {
             steps {
                 dir('backend/notification-service') {
                     sh '''
-                      rm -f notification-service.zip \
+                      rm -f notification-service.zip
                       zip -r notification-service.zip src node_modules package.json
                     '''
                 }
