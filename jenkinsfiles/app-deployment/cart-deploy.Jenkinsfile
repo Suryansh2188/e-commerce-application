@@ -21,7 +21,7 @@ pipeline {
         stage('Deploy Cart Microservice') {
             steps {
                 dir('ansible') {
-                    withCredentials([string(credentialsId: 'cart-mongodb-uri', variable: 'MONGODB_URI')]) {
+                    withCredentials([string(credentialsId: 'cart-mongodb-uri', variable: 'MONGODB_URI'), sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                         sh '''
                         echo "Installing Ansible collections..."
 
@@ -31,7 +31,9 @@ pipeline {
                                     -i inventory/inventory.ini \
                                      site.yaml \
                                      --limit cart \
-                                     --extra-vars "mongodb_uri=$MONGODB_URI"
+                                     --extra-vars "mongodb_uri=$MONGODB_URI" \
+                                     --private-key "$SSH_KEY" \
+                                     -u "$SSH_USER"
                           '''
                     }
                 }
