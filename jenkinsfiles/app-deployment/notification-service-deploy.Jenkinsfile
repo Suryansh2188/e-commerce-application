@@ -40,7 +40,10 @@ pipeline {
         stage('Create Deployment Package Artifact') {
             steps {
                 dir('backend/notification-service') {
-                    sh 'zip -r notification-service.zip src node_modules package.json'
+                    sh '''
+                      rm -f notification-service.zip \
+                      zip -r notification-service.zip src node_modules package.json
+                    '''
                 }
             }
             post {
@@ -62,7 +65,8 @@ pipeline {
                     sh '''
                    aws lambda update-function-code \
                       --function-name shopitry-notification-service \
-                      --zip-file fileb://notification-service.zip
+                      --zip-file fileb://notification-service.zip \
+                      --publish
                     '''
                 }
             }
