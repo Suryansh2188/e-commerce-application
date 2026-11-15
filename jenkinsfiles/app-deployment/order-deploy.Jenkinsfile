@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        CART_SERVICE_URL = 'http://10.0.2.12:5002'
-        PAYMENT_SERVICE_URL = 'https://6ownbyflwj4kopkun5ewyylc7a0kchyi.lambda-url.us-east-1.on.aws/'
-        NOTIFICATION_SERVICE_URL = 'https://u7a32r2dkfxhxo6w3s6ompx5v40moajn.lambda-url.us-east-1.on.aws/'
+        CART_SERVICE_URL = 'http://10.0.3.12:5002'
+        PAYMENT_SERVICE_URL = 'https://ejcoxagxm7vgra7btjxpznt7wm0xwmld.lambda-url.us-east-1.on.aws/'
+        NOTIFICATION_SERVICE_URL = 'https://a27hvn4lmx7sddup7b7hmxtg340grtmp.lambda-url.us-east-1.on.aws/'
     }
     stages {
         stage('Checkout Code') {

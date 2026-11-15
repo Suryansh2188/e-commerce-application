@@ -7,9 +7,9 @@ USERNAME="$SSH_USER"
 # List your instance IP addresses
 INSTANCE_IPS=(
     "10.0.1.10"
-    "10.0.2.11"
-    "10.0.2.12"
-    "10.0.2.13"
+    "10.0.3.11"
+    "10.0.3.12"
+    "10.0.3.13"
 )
 
 # Jenkins provides these variables
