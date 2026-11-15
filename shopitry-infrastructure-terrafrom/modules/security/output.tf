@@ -9,3 +9,7 @@ output "public_services_security_group_id" {
 output "private_services_security_group_id" {
   value = aws_security_group.private_services.id
 }
+
+output "alb_security_group_id" {
+  value = aws_security_group.alb_sg.id
+}

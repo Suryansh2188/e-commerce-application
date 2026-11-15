@@ -105,3 +105,21 @@ module "vpc_peering_routing" {
   public_sg_id  = module.security.public_services_security_group_id
   private_sg_id = module.security.private_services_security_group_id
 }
+
+
+module "alb_target_group" {
+  source = "./modules/target-group"
+
+  vpc_id = module.network.vpc_id
+  gateway_instance_id = module.ec2_services.instance_ids["gateway"]
+}
+
+module "alb" {
+  source = "./modules/alb"
+
+  target_group_arn = module.alb_target_group.target_group_arn
+  public_subnet_ids = values(module.network.public_subnet_ids_by_az)
+  alb_security_group_id = module.security.alb_security_group_id
+  acm_certificate_arn = ""
+
+}

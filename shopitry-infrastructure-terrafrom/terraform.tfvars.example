@@ -37,6 +37,8 @@ instance_type = "m7i-flex.large"
 
 key_name = "YOUR_KEY_NAME"
 
+acm_certificate_arn = "YOUR_ACM_CERTIFICATE_ARN"
+
 
 # ---------------------------------------------------------
 # EC2 MICROSERVICES

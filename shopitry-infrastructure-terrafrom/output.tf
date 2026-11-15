@@ -55,3 +55,18 @@ output "vpc_peering_connection_status" {
   description = "Status of the VPC peering connection request."
   value       = module.vpc_peering.vpc_peering_connection_status
 }
+
+output "alb_security_group_id" {
+  description = "ALB security group ID"
+  value = module.security.alb_security_group_id
+}
+
+output "alb_target_group_arn" {
+  description = "ALB target group ARN."
+  value = module.alb_target_group.target_group_arn
+}
+
+output "alb_arn" {
+  description = "ARN of alb"
+  value = module.alb.alb_arn
+}

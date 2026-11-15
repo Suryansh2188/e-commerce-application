@@ -69,6 +69,40 @@
 #   cidr_ipv4 = "0.0.0.0/0"
 # }
 
+resource "aws_security_group" "alb_sg" {
+  name        = "${var.project_name}-ALB-sg"
+  description = "Security group for Application Load Balancer"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description = "Allow HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow HTTP for HTTPS redirect"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-ALB-sg"
+  }
+}
+
+
 # =========================================================
 # PUBLIC SERVICES SECURITY GROUP
 # =========================================================
@@ -88,6 +122,20 @@ resource "aws_vpc_security_group_ingress_rule" "public" {
   security_group_id = aws_security_group.public_services.id
 
   description = "Public services inbound"
+
+  ip_protocol = "tcp"
+
+  from_port = 5000
+  to_port   = 5000
+
+  referenced_security_group_id = aws_security_group.alb_sg.id
+}
+
+
+resource "aws_vpc_security_group_ingress_rule" "alb" {
+  security_group_id = aws_security_group.public_services.id
+
+  description = "ALB inbound"
 
   ip_protocol = "tcp"
 
