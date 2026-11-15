@@ -120,6 +120,6 @@ module "alb" {
   target_group_arn = module.alb_target_group.target_group_arn
   public_subnet_ids = values(module.network.public_subnet_ids_by_az)
   alb_security_group_id = module.security.alb_security_group_id
-  acm_certificate_arn = ""
+  acm_certificate_arn = var.acm_certificate_arn
 
 }
