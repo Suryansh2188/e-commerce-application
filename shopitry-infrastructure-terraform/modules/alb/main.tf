@@ -40,7 +40,7 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_lb_listener_rule" "https" {
-  listener_arn = var.acm_certificate_arn
+  listener_arn = aws_lb_listener.https.arn
   priority     = 1
 
   action {
