@@ -11,12 +11,12 @@ variable "vpc_peering_connection_id" {
   type = string
 }
 
-variable "private_rt_id" {
-  type = string
+variable "private_rt_ids" {
+  type = map(string)
 }
 
-variable "public_rt_id" {
-  type = string
+variable "public_rt_ids" {
+  type = map(string)
 }
 
 variable "public_sg_id" {

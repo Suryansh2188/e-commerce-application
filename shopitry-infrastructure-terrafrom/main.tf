@@ -9,13 +9,13 @@ module "network" {
 
   aws_region = var.aws_region
 
-  availability_zone = var.availability_zone
+  availability_zones = var.availability_zones
 
   vpc_cidr = var.vpc_cidr
 
-  public_subnet_cidr = var.public_subnet_cidr
+  public_subnet_cidrs = var.public_subnet_cidrs
 
-  private_subnet_cidr = var.private_subnet_cidr
+  private_subnet_cidrs = var.private_subnet_cidrs
 }
 
 
@@ -60,9 +60,9 @@ module "ec2_services" {
 
   key_name = var.key_name
 
-  public_subnet_id = module.network.public_subnet_id
+  public_subnet_id = module.network.public_subnet_ids_by_az["us-east-1a"]
 
-  private_subnet_id = module.network.private_subnet_id
+  private_subnet_id = module.network.private_subnet_ids_by_az["us-east-1a"]
 
   public_services_security_group_id = module.security.public_services_security_group_id
 
@@ -96,40 +96,12 @@ module "vpc_peering_routing" {
 
   instance_id               = var.instance_id
   peer_vpc_cidr             = var.vpc_cidr
-  default_vpc_cidr = data.aws_vpc.default.cidr_block
+  default_vpc_cidr          = data.aws_vpc.default.cidr_block
   vpc_peering_connection_id = module.vpc_peering.vpc_peering_connection_id
 
-  public_rt_id = module.network.public_rt_id
-  private_rt_id = module.network.private_rt_id
+  public_rt_ids  = module.network.public_rt_ids
+  private_rt_ids = module.network.private_rt_ids
 
-  public_sg_id = module.security.public_services_security_group_id
+  public_sg_id  = module.security.public_services_security_group_id
   private_sg_id = module.security.private_services_security_group_id
-}
-
-
-
-resource "local_file" "terraform_outputs" {
-  filename = "${path.root}/generated/terraform-outputs.env"
-
-  content = <<-EOT
-VPC_ID=${module.network.vpc_id}
-
-PUBLIC_SUBNET_ID=${module.network.public_subnet_id}
-PRIVATE_SUBNET_ID=${module.network.private_subnet_id}
-
-GATEWAY_PUBLIC_IP=${module.ec2_services.public_ips["gateway"]}
-GATEWAY_PRIVATE_IP=${module.ec2_services.private_ips["gateway"]}
-
-CATALOG_PRIVATE_IP=${module.ec2_services.private_ips["catalog"]}
-CART_PRIVATE_IP=${module.ec2_services.private_ips["cart"]}
-ORDER_PRIVATE_IP=${module.ec2_services.private_ips["order"]}
-
-PAYMENT_SERVICE_URL=${module.lambda_functions.payment_function_url}
-NOTIFICATION_SERVICE_URL=${module.lambda_functions.notification_function_url}
-
-PAYMENT_LAMBDA_ARN=${module.lambda_functions.payment_lambda_function_arn}
-NOTIFICATION_LAMBDA_ARN=${module.lambda_functions.notification_lambda_function_arn}
-
-SNS_TOPIC_ARN=${module.lambda_functions.sns_topic_arn}
-EOT
 }

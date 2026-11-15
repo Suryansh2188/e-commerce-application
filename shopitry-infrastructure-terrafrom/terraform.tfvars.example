@@ -2,13 +2,23 @@ project_name = "shopitry"
 
 aws_region = "us-east-1"
 
-availability_zone = "us-east-1b"
+availability_zones = [
+  "us-east-1a",
+  "us-east-1b"
+]
 
 vpc_cidr = "10.0.0.0/16"
 
-public_subnet_cidr = "10.0.1.0/24"
+public_subnet_cidrs = [
+  "10.0.1.0/24",
+  "10.0.2.0/24"
+]
 
-private_subnet_cidr = "10.0.2.0/24"
+private_subnet_cidrs = [
+  "10.0.3.0/24",
+  "10.0.4.0/24"
+]
+
 
 # ---------------------------------------------------------
 # Control plan EC2 Id
@@ -56,7 +66,7 @@ services = {
 
     port = 5001
 
-    private_ip = "10.0.2.11"
+    private_ip = "10.0.3.11"
 
     public = false
   }
@@ -70,7 +80,7 @@ services = {
 
     port = 5002
 
-    private_ip = "10.0.2.12"
+    private_ip = "10.0.3.12"
 
     public = false
   }
@@ -84,7 +94,7 @@ services = {
 
     port = 5003
 
-    private_ip = "10.0.2.13"
+    private_ip = "10.0.3.13"
 
     public = false
   }

@@ -16,22 +16,19 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  description = "Public subnet CIDR"
-  type        = string
-  default     = "10.0.1.0/24"
+variable "public_subnet_cidrs" {
+  description = "Public subnet CIDRs"
+  type        = list(string)
 }
 
-variable "private_subnet_cidr" {
-  description = "Private subnet CIDR"
-  type        = string
-  default     = "10.0.2.0/24"
+variable "private_subnet_cidrs" {
+  description = "Private subnet CIDRs"
+  type        = list(string)
 }
 
-variable "availability_zone" {
-  description = "Availability zone"
-  type        = string
-  default     = "ap-south-1a"
+variable "availability_zones" {
+  description = "Availability zones"
+  type        = list(string)
 }
 
 variable "ami_id" {

@@ -28,15 +28,19 @@ resource "aws_route" "to_peer_vpc" {
 
 # Microservices private route table entry
 resource "aws_route" "private_rt" {
-  route_table_id = var.private_rt_id
-  destination_cidr_block = var.default_vpc_cidr
+  for_each = var.private_rt_ids
+
+  route_table_id            = each.value
+  destination_cidr_block    = var.default_vpc_cidr
   vpc_peering_connection_id = var.vpc_peering_connection_id
 }
 
 # API Gateway public route table entry
 resource "aws_route" "public_rt" {
-  route_table_id = var.public_rt_id
-  destination_cidr_block = var.default_vpc_cidr
+  for_each = var.public_rt_ids
+
+  route_table_id            = each.value
+  destination_cidr_block    = var.default_vpc_cidr
   vpc_peering_connection_id = var.vpc_peering_connection_id
 }
 

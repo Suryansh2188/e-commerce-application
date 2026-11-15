@@ -3,11 +3,11 @@ output "vpc_id" {
 }
 
 output "public_subnet_id" {
-  value = module.network.public_subnet_id
+  value = module.network.public_subnet_ids_by_az
 }
 
 output "private_subnet_id" {
-  value = module.network.private_subnet_id
+  value = module.network.private_subnet_ids_by_az
 }
 
 
