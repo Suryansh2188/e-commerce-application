@@ -4,6 +4,7 @@ pipeline{
     environment {
         INSTANCE_ID = 'i-0b188089b9df7ebac'
         KEY_NAME = 'uskey'
+        ACM_CERTIFICATE_ARN = 'arn:aws:acm:us-east-1:202906063966:certificate/358627f7-818e-4065-8e1b-af945e4fb3c7'
     }
     stages{
         stage("checkout-code-stage"){
@@ -25,7 +26,7 @@ pipeline{
 
         stage("copy-tfvars-file-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh 'cp terraform.tfvars.example terraform.tfvars'
                 }
             }
@@ -45,7 +46,7 @@ pipeline{
 
         stage("terraform-init-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh 'terraform init'
                 }
             }
@@ -65,7 +66,7 @@ pipeline{
 
         stage("terraform-validate-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh 'terraform validate'
                 }
             }
@@ -85,11 +86,12 @@ pipeline{
 
         stage("terraform-plan-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh '''
                     terraform plan \
                     -var="instance_id=${INSTANCE_ID}" \
-                    -var="key_name=${KEY_NAME}"
+                    -var="key_name=${KEY_NAME}" \
+                    -var="acm_certificate_arn=${ACM_CERTIFICATE_ARN}"
                 '''
                 }
             }
@@ -127,11 +129,12 @@ pipeline{
 
         stage("terraform-apply-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh '''
                     terraform apply --auto-approve \
                     -var="instance_id=${INSTANCE_ID}" \
-                    -var="key_name=${KEY_NAME}"
+                    -var="key_name=${KEY_NAME}" \
+                    -var="acm_certificate_arn=${ACM_CERTIFICATE_ARN}"
                 '''
                 }
             }

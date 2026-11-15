@@ -26,7 +26,7 @@ pipeline{
 
         stage("copy-tfvars-file-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh 'cp terraform.tfvars.example terraform.tfvars'
                 }
             }
@@ -46,7 +46,7 @@ pipeline{
 
         stage("terraform-init-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh 'terraform init'
                 }
             }
@@ -66,7 +66,7 @@ pipeline{
 
         stage("infra-destroy-stage"){
             steps{
-                dir('shopitry-infrastructure-terrafrom') {
+                dir('shopitry-infrastructure-terraform') {
                     sh '''
                     terraform destroy --auto-approve \
                     -var="instance_id=${INSTANCE_ID}" \
