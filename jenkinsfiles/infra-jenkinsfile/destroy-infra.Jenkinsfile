@@ -4,6 +4,7 @@ pipeline{
     environment {
         INSTANCE_ID = 'i-0b188089b9df7ebac'
         KEY_NAME = 'uskey'
+        ACM_CERTIFICATE_ARN = 'arn:aws:acm:us-east-1:202906063966:certificate/358627f7-818e-4065-8e1b-af945e4fb3c7'
     }
 
     stages{
@@ -70,7 +71,8 @@ pipeline{
                     sh '''
                     terraform destroy --auto-approve \
                     -var="instance_id=${INSTANCE_ID}" \
-                    -var="key_name=${KEY_NAME}"
+                    -var="key_name=${KEY_NAME}" \
+                    -var="acm_certificate_arn=${ACM_CERTIFICATE_ARN}"
                 '''
                 }
             }
