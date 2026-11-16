@@ -4,7 +4,7 @@ pipeline{
     environment {
         INSTANCE_ID = 'i-0b188089b9df7ebac'
         KEY_NAME = 'uskey'
-        ACM_CERTIFICATE_ARN = 'arn:aws:acm:us-east-1:202906063966:certificate/358627f7-818e-4065-8e1b-af945e4fb3c7'
+        ACM_CERTIFICATE_ARN = 'arn:aws:acm:us-east-1:202906063966:certificate/f79c80cf-fb65-4ffb-8fa7-8ac81569e6ff'
     }
     stages{
         stage("checkout-code-stage"){
