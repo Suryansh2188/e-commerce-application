@@ -121,20 +121,6 @@ resource "aws_security_group" "public_services" {
 resource "aws_vpc_security_group_ingress_rule" "public" {
   security_group_id = aws_security_group.public_services.id
 
-  description = "Public services inbound"
-
-  ip_protocol = "tcp"
-
-  from_port = 5000
-  to_port   = 5000
-
-  referenced_security_group_id = aws_security_group.alb_sg.id
-}
-
-
-resource "aws_vpc_security_group_ingress_rule" "alb" {
-  security_group_id = aws_security_group.public_services.id
-
   description = "ALB inbound"
 
   ip_protocol = "tcp"
@@ -142,7 +128,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb" {
   from_port = 5000
   to_port   = 5000
 
-  cidr_ipv4 = "0.0.0.0/0"
+  referenced_security_group_id = aws_security_group.alb_sg.id
 }
 
 # Public service outbound
