@@ -97,7 +97,7 @@ pipeline {
                 dir('frontend/admin-dashboard') {
                     sh '''
                     aws cloudfront create-invalidation \
-                    --distribution-id ${USER_DISTRIBUTION_ID} \
+                    --distribution-id ${ADMIN_DISTRIBUTION_ID} \
                     --paths "/*"
                 '''
                 }
