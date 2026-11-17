@@ -87,3 +87,41 @@ variable "services" {
 variable "acm_certificate_arn" {
   type = string
 }
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "prod"
+}
+
+variable "user_bucket_name" {
+  description = "User frontend S3 bucket"
+  type        = string
+}
+
+variable "admin_bucket_name" {
+  description = "Admin frontend S3 bucket"
+  type        = string
+}
+
+variable "user_domain" {
+  description = "User frontend domain"
+  type        = string
+  default     = "xyz.com"
+}
+
+variable "admin_domain" {
+  description = "Admin frontend domain"
+  type        = string
+  default     = "admin.xyz.com"
+}
+
+variable "tags" {
+  description = "Common resource tags"
+  type        = map(string)
+
+  default = {
+    Project   = "Frontend"
+    ManagedBy = "Terraform"
+  }
+}

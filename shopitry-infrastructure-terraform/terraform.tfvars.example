@@ -1,6 +1,7 @@
 project_name = "shopitry"
 
 aws_region = "us-east-1"
+environment = "prod"
 
 availability_zones = [
   "us-east-1a",
@@ -38,6 +39,12 @@ instance_type = "m7i-flex.large"
 key_name = "YOUR_KEY_NAME"
 
 acm_certificate_arn = "YOUR_ACM_CERTIFICATE_ARN"
+
+user_bucket_name = "shopitry-user-frontend-prod"
+admin_bucket_name = "shopitry-admin-frontend-prod"
+
+user_domain  = "suryanshsoni.online"
+admin_domain = "admin.suryanshsoni.online"
 
 
 # ---------------------------------------------------------
@@ -100,4 +107,10 @@ services = {
 
     public = false
   }
+}
+
+tags = {
+  Project     = "MyApplication"
+  Environment = "Production"
+  ManagedBy   = "Terraform"
 }

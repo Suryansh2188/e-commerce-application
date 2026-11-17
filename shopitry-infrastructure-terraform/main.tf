@@ -123,3 +123,81 @@ module "alb" {
   acm_certificate_arn = var.acm_certificate_arn
 
 }
+
+# =====================================
+# USER FRONTEND S3 BUCKET
+# =====================================
+
+module "user_s3" {
+  source = "./modules/s3"
+
+  bucket_name = var.user_bucket_name
+  environment = var.environment
+
+  tags = var.tags
+}
+
+# =====================================
+# ADMIN FRONTEND S3 BUCKET
+# =====================================
+
+module "admin_s3" {
+  source = "./modules/s3"
+
+  bucket_name = var.admin_bucket_name
+  environment = var.environment
+
+  tags = var.tags
+}
+
+# =====================================
+# USER FRONTEND CLOUDFRONT
+# =====================================
+
+module "user_cloudfront" {
+  source = "./modules/cloudfront"
+
+  application_name = "${var.project_name}-user-frontend-clf"
+
+  domain_name = var.user_domain
+
+  s3_bucket_id = module.user_s3.bucket_id
+
+  s3_bucket_arn = module.user_s3.bucket_arn
+
+  s3_bucket_regional_domain_name = module.user_s3.bucket_regional_domain_name
+
+  acm_certificate_arn = var.acm_certificate_arn
+
+  environment = var.environment
+
+  price_class = "PriceClass_100"
+
+  tags = var.tags
+}
+
+# =====================================
+# ADMIN FRONTEND CLOUDFRONT
+# =====================================
+
+module "admin_cloudfront" {
+  source = "./modules/cloudfront"
+
+  application_name = "${var.project_name}-admin-frontend-clf"
+
+  domain_name = var.admin_domain
+
+  s3_bucket_id = module.admin_s3.bucket_id
+
+  s3_bucket_arn = module.admin_s3.bucket_arn
+
+  s3_bucket_regional_domain_name = module.admin_s3.bucket_regional_domain_name
+
+  acm_certificate_arn = var.acm_certificate_arn
+
+  environment = var.environment
+
+  price_class = "PriceClass_100"
+
+  tags = var.tags
+}

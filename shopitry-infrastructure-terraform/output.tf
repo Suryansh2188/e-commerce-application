@@ -70,3 +70,33 @@ output "alb_arn" {
   description = "ARN of alb"
   value = module.alb.alb_arn
 }
+
+# User S3 bucket
+output "user_s3_bucket_name" {
+  value = module.user_s3.bucket_id
+}
+
+# Admin S3 bucket
+output "admin_s3_bucket_name" {
+  value = module.admin_s3.bucket_id
+}
+
+# User CloudFront distribution ID
+output "user_cloudfront_distribution_id" {
+  value = module.user_cloudfront.cloudfront_distribution_id
+}
+
+# Admin CloudFront distribution ID
+output "admin_cloudfront_distribution_id" {
+  value = module.admin_cloudfront.cloudfront_distribution_id
+}
+
+# User CloudFront domain
+output "user_cloudfront_domain" {
+  value = module.user_cloudfront.cloudfront_domain_name
+}
+
+# Admin CloudFront domain
+output "admin_cloudfront_domain" {
+  value = module.admin_cloudfront.cloudfront_domain_name
+}
