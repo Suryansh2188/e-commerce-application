@@ -4,7 +4,7 @@ pipeline{
     environment {
         INSTANCE_ID = 'i-0b188089b9df7ebac'
         KEY_NAME = 'uskey'
-        ACM_CERTIFICATE_ARN = 'arn:aws:acm:us-east-1:202906063966:certificate/f79c80cf-fb65-4ffb-8fa7-8ac81569e6ff'
+        ACM_CERTIFICATE_ARN = 'arn:aws:acm:us-east-1:202906063966:certificate/a26c710d-bbc8-4a7d-b95d-1b586db7f46a'
     }
 
     stages{
