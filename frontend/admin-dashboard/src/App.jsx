@@ -579,6 +579,7 @@ export default function App() {
                     <option value="Wearables">Wearables</option>
                     <option value="Accessories">Accessories</option>
                     <option value="Smart Home">Smart Home</option>
+                    <option value="Cloths">Cloths</option>
                   </select>
                 </div>
               </div>
