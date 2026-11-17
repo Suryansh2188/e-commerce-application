@@ -3,7 +3,7 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
 
-        USER_BUCKET = 'shopitry-admin-frontend-prod'
+        ADMIN_BUCKET = 'shopitry-admin-frontend-prod'
 
         ADMIN_DISTRIBUTION_ID = 'E1HKBP0124ZKBT'
     }
@@ -72,7 +72,7 @@ pipeline {
                 echo '====++++executing Deploy to S3++++===='
                 dir('frontend/admin-dashboard') {
                     sh '''
-                    aws s3 sync dist/ s3://${USER_BUCKET}/ \
+                    aws s3 sync dist/ s3://${ADMIN_BUCKET}/ \
                     --delete \
                     --region ${AWS_REGION}
                 '''
