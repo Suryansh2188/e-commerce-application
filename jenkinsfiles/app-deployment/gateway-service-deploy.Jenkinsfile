@@ -4,8 +4,8 @@ pipeline {
         CATALOG_SERVICE_URL = 'http://10.0.3.11:5001'
         CART_SERVICE_URL = 'http://10.0.3.12:5002'
         ORDER_SERVICE_URL = 'http://10.0.3.13:5003'
-        PAYMENT_SERVICE_URL = 'https://qt64yqwmqe7llhw753aejqe5la0kwxut.lambda-url.us-east-1.on.aws/'
-        NOTIFICATION_SERVICE_URL = 'https://wektn3ax3mlxfbutcp67z2l52y0xwrct.lambda-url.us-east-1.on.aws/'
+        PAYMENT_SERVICE_URL = 'https://2bi6d4ksjdwh7cdhmoh2vgq5eu0vhzal.lambda-url.us-east-1.on.aws/'
+        NOTIFICATION_SERVICE_URL = 'https://35vvzgd2ezngek2iw6z7dhciki0xcwyg.lambda-url.us-east-1.on.aws/'
     }
     stages {
         stage('Checkout Code') {
