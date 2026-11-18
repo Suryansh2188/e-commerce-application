@@ -1,363 +1,91 @@
-# ShopiTry: Enterprise AWS Production Deployment Guide
-
-This document provides a comprehensive, step-by-step production deployment guide for the **ShopiTry** full-stack microservices ecosystem. It covers provisioning databases on MongoDB Atlas, deploying serverless functions to AWS Lambda, deploying core microservices to AWS EC2 / VM Instances, and hosting twin React SPAs on AWS S3 with CloudFront CDN distributions.
-
----
-
-## 🔑 Production Environment & Database Parameters
-
-| Parameter | Value |
-| :--- | :--- |
-| **Application Name** | `ShopiTry` |
-| **MongoDB Atlas Cluster Name** | `edublitz` |
-| **Database Username** | `linux` |
-| **Database Password** | `redhat` |
-| **Connection URI Pattern** | `mongodb+srv://<db_username>:<db_password>@edublitz.laegfsa.mongodb.net/?appName=edublitz` |
-| **Catalog Database Name** | `catalog_db` |
-| **Cart Database Name** | `cart_db` |
-| **Orders Database Name** | `orders_db` |
-
----
-
-## 📋 Architecture & Deployment Topology
-
-| Component | Target Infrastructure | Deployment Primitive | Target URL / Port |
-| :--- | :--- | :--- | :--- |
-| **`storefront`** | AWS S3 Bucket + CloudFront CDN | React Production SPA (`dist/`) | `https://store.shopitry.com` |
-| **`admin-dashboard`** | AWS S3 Bucket + CloudFront CDN | React Production SPA (`dist/`) | `https://admin.shopitry.com` |
-| **`gateway-service`** | AWS EC2 (VM Server 1) | Node.js + PM2 + Nginx Proxy | `https://api.shopitry.com` (5000) |
-| **`catalog-service`** | AWS EC2 (VM Server 2) | Node.js + PM2 + MongoDB Atlas | Private VPC (5001) |
-| **`cart-service`** | AWS EC2 (VM Server 3) | Node.js + PM2 + MongoDB Atlas | Private VPC (5002) |
-| **`order-service`** | AWS EC2 (VM Server 4) | Node.js + PM2 + MongoDB Atlas | Private VPC (5003) |
-| **`payment-service`** | AWS Lambda 1 | Node.js 20.x Runtime | AWS Lambda API Gateway (5004) |
-| **`notification-service`** | AWS Lambda 2 | Node.js 20.x Runtime | AWS Lambda API Gateway (5005) |
-
----
-```
-url to install mongosh - https://www.mongodb.com/docs/mongodb-shell/install/?operating-system=linux&linux-distribution=ubuntu&ubuntu-version=noble 
-url to install node npm - https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-22-04
-```
-## 🗄️ Phase 1: MongoDB Atlas Database Provisioning (`edublitz`)
-
-1. Connect to the **MongoDB Atlas Cluster** named `edublitz`:
-   - Cluster Host: `edublitz.laegfsa.mongodb.net`
-   - Application Name: `edublitz`
-2. Create the Database User and Password:
-   - **Username**: `linux`
-   - **Password**: `redhat`
-3. Verify the creation of the three microservice databases:
-   - `catalog_db`
-   - `cart_db`
-   - `orders_db`
-4. Add your EC2 VM server public/private IPs to the Atlas **Network Access / IP Access List**.
-5. The MongoDB Atlas Connection URIs for each microservice are:
-
-   **Catalog Service Connection URI**:
-   ```env
-   MONGODB_URI=mongodb+srv://linux:redhat@edublitz.laegfsa.mongodb.net/catalog_db?appName=edublitz
-   ```
-
-   **Cart Service Connection URI**:
-   ```env
-   MONGODB_URI=mongodb+srv://linux:redhat@edublitz.laegfsa.mongodb.net/cart_db?appName=edublitz
-   ```
-
-   **Order Service Connection URI**:
-   ```env
-   MONGODB_URI=mongodb+srv://linux:redhat@edublitz.laegfsa.mongodb.net/orders_db?appName=edublitz
-   ```
-
----
-
-## ⚡ Phase 2: Deploying AWS Lambda Serverless Functions
-
-### 1. Deploy `payment-service` (AWS Lambda 1)
-```
-aws iam create-role \
-  --role-name ShopiTryLambdaRole \
-  --assume-role-policy-document '{
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "://amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  }'
-
-```
-```
-aws iam attach-role-policy \
-  --role-name ShopiTryLambdaRole \
-  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
-```
-```
-aws lambda create-function \
-  --function-name shopitry-payment-service \
-  --runtime nodejs20.x \
-  --role arn:aws:iam::897013207591:role/ShopiTryLambdaRole \
-  --handler src/handler.handler \
-  --zip-file fileb://payment-service.zip \
-  --region us-east-1  #ap-south-1
-
-```
-
-```bash
-# Navigate to payment service
-cd backend/payment-service
-
-# Install production dependencies only
-npm install --production
-
-# Create deployment package artifact
-zip -r payment-service.zip src node_modules package.json
-
-# Deploy to AWS Lambda via AWS CLI
-aws lambda create-function \
-  --function-name shopitry-payment-service \
-  --runtime nodejs20.x \
-  --role arn:aws:iam::123456789012:role/service-role/ShopiTryLambdaRole \
-  --handler src/handler.handler \
-  --zip-file fileb://payment-service.zip \
-  --region us-east-1
-
-# Configure environment variables
-aws lambda update-function-configuration \
-  --function-name shopitry-payment-service \
-  --environment "Variables={AWS_REGION=us-east-1,PAYMENT_GATEWAY_MODE=PRODUCTION}"
-```
-
-### 2. Deploy `notification-service` (AWS Lambda 2)
-```
-aws sns create-topic \
-  --name aethercart-notifications \
-  --region ap-south-1
-```
-```
-aws lambda create-function \
-  --function-name shopitry-notification-service \
-  --runtime nodejs20.x \
-  --role arn:aws:iam::897013207591:role/ShopiTryLambdaRole \
-  --handler src/handler.handler \
-  --zip-file fileb://notification-service.zip \
-  --region us-east-1
-```
-
-```bash
-# Navigate to notification service
-cd backend/notification-service
-
-# Install production dependencies
-npm install --production
-
-# Create deployment package artifact
-zip -r notification-service.zip src node_modules package.json
-
-# Deploy to AWS Lambda via AWS CLI
-aws lambda create-function \
-  --function-name shopitry-notification-service \
-  --runtime nodejs20.x \
-  --role arn:aws:iam::123456789012:role/service-role/ShopiTryLambdaRole \
-  --handler src/handler.handler \
-  --zip-file fileb://notification-service.zip \
-  --region us-east-1
-```
-
----
-
-## 🖥️ Phase 3: Deploying Core Microservices to AWS EC2 / VM Instances
-
-### 1. Provision EC2 Instances
-Launch 4 Ubuntu 22.04 LTS EC2 instances (or VM Servers):
-- **VM Server 1**: `gateway-service` (Public subnet, Ports 80, 443, 5000)
-- **VM Server 2**: `catalog-service` (Private subnet, Port 5001)
-- **VM Server 3**: `cart-service` (Private subnet, Port 5002)
-- **VM Server 4**: `order-service` (Private subnet, Port 5003)
-
-### 2. Server Setup Commands (All VM Servers)
-Execute on each VM server via SSH:
-
-```bash
-# Update system packages
-sudo apt update && sudo apt upgrade -y
-
-# Install Node.js 20 LTS & Nginx
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs git nginx
-
-# Install PM2 process manager globally
-sudo npm install -g pm2
-```
-
-### 3. Deploy Gateway Service (VM Server 1)
-
-```bash
-# Clone project repository
-git clone https://github.com/your-org/placement-project.git /var/www/shopitry
-cd /var/www/shopitry/backend/gateway-service
-
-# Install dependencies
-npm install --production
-
-# Configure production .env file
-cat <<EOT > .env
-PORT=5000
-JWT_SECRET=shopitry_super_secret_jwt_key_2026
-CATALOG_SERVICE_URL=http://<VM_SERVER_2_PRIVATE_IP>:5001
-CART_SERVICE_URL=http://<VM_SERVER_3_PRIVATE_IP>:5002
-ORDER_SERVICE_URL=http://<VM_SERVER_4_PRIVATE_IP>:5003
-PAYMENT_SERVICE_URL=http://<LAMBDA_PAYMENT_URL_OR_PORT_5004>
-NOTIFICATION_SERVICE_URL=http://<LAMBDA_NOTIFICATION_URL_OR_PORT_5005>
-EOT
-
-# Start gateway service using PM2
-pm2 start src/index.js --name "gateway-service"
-pm2 save
-pm2 startup
-```
-
-### 4. Deploy Catalog Service (VM Server 2)
-
-```bash
-cd /var/www/shopitry/backend/catalog-service
-npm install --production
-
-cat <<EOT > .env
-PORT=5001
-MONGODB_URI=mongodb+srv://linux:redhat@edublitz.laegfsa.mongodb.net/catalog_db?appName=edublitz
-EOT
-
-pm2 start src/index.js --name "catalog-service"
-pm2 save
-```
-
-### 5. Deploy Cart Service (VM Server 3)
-
-```bash
-cd /var/www/shopitry/backend/cart-service
-npm install --production
-
-cat <<EOT > .env
-PORT=5002
-MONGODB_URI=mongodb+srv://linux:redhat@edublitz.laegfsa.mongodb.net/cart_db?appName=edublitz
-EOT
-
-pm2 start src/index.js --name "cart-service"
-pm2 save
-```
-
-### 6. Deploy Order Service (VM Server 4)
-
-```bash
-cd /var/www/shopitry/backend/order-service
-npm install --production
-
-cat <<EOT > .env
-PORT=5003
-MONGODB_URI=mongodb+srv://linux:redhat@edublitz.laegfsa.mongodb.net/orders_db?appName=edublitz
-CART_SERVICE_URL=http://<VM_SERVER_3_PRIVATE_IP>:5002
-PAYMENT_SERVICE_URL=http://<LAMBDA_PAYMENT_URL_OR_PORT_5004>
-NOTIFICATION_SERVICE_URL=http://<LAMBDA_NOTIFICATION_URL_OR_PORT_5005>
-EOT
-
-pm2 start src/index.js --name "order-service"
-pm2 save
-```
-
-### 7. Configure Nginx Reverse Proxy & SSL on Gateway Server
-On **VM Server 1** (`gateway-service`):
-
-```bash
-# Create Nginx configuration
-sudo nano /etc/nginx/sites-available/shopitry
-
-# Paste configuration:
-server {
-    server_name api.shopitry.com;
-
-    location / {
-        proxy_pass http://localhost:5000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-
-# Enable site & restart Nginx
-sudo ln -s /etc/nginx/sites-available/shopitry /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
-
-# SSL Certificate setup with Certbot
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d api.shopitry.com
-```
-
----
-
-## 🌐 Phase 4: Deploying React SPAs to AWS S3 & CloudFront
-
-### 1. Deploy Customer Storefront (`frontend/storefront`)
-
-```bash
-# Build React storefront for production
-cd frontend/storefront
-npm run build
-
-# Create S3 Bucket
-aws s3 mb s3://shopitry-storefront-prod --region us-east-1
-
-# Enable static website hosting
-aws s3 website s3://shopitry-storefront-prod/ --index-document index.html --error-document index.html
-
-# Sync build files to S3 bucket
-aws s3 sync dist/ s3://shopitry-storefront-prod --delete --acl public-read
-```
-
-### 2. Deploy Operations Admin Dashboard (`frontend/admin-dashboard`)
-
-```bash
-# Build React admin application for production
-cd frontend/admin-dashboard
-npm run build
-
-# Create S3 Bucket
-aws s3 mb s3://shopitry-admin-prod --region us-east-1
-
-# Enable static website hosting
-aws s3 website s3://shopitry-admin-prod/ --index-document index.html --error-document index.html
-
-# Sync build files to S3 bucket
-aws s3 sync dist/ s3://shopitry-admin-prod --delete --acl public-read
-```
-
----
-
-## 🔍 Phase 5: Verification & Health Checks
-
-Run these commands to verify that all deployment targets are online and healthy:
-
-```bash
-# 1. Test Gateway Health Endpoint
-curl -i https://api.shopitry.com/health
-
-# 2. Test Catalog Products API via Gateway
-curl -i https://api.shopitry.com/api/catalog/products
-
-# 3. Test Admin Authentication via Gateway
-curl -i -X POST https://api.shopitry.com/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@shopitry.com","password":"adminpassword123"}'
-
-# 4. Check PM2 status on VM Servers
-pm2 status
-pm2 logs --lines 50
-```
+# AWS deployment guide
+
+This guide describes the deployment workflow represented by the repository. It is an operator checklist, not a fully automated account bootstrap: DNS delegation, ACM certificate issuance, Jenkins host preparation, and some environment-specific values must be prepared separately.
+
+## Deployment architecture
+
+- **Jenkins host:** one EC2 instance in the default VPC. It runs the Jenkins jobs and uses an attached IAM role for AWS access.
+- **Application VPC:** Terraform creates a VPC with public and private subnets in two availability zones, internet/NAT gateways, and VPC peering and routes to the default VPC.
+- **Application instances:** the gateway runs on a public EC2 instance; catalog, cart, and order run on private EC2 instances. Terraform currently wires the service instances to subnet IDs in `us-east-1a`, so the current compute deployment is not spread across both AZs.
+- **Public API:** an Application Load Balancer accepts HTTP/HTTPS and forwards HTTPS API traffic to the gateway target group.
+- **Frontends:** the storefront and admin dashboard are deployed to separate S3 buckets and served through CloudFront distributions with private S3 origins.
+- **Serverless services:** Terraform creates payment and notification Lambda resources and Function URLs. The Terraform module currently packages placeholder handlers; the application deployment jobs must publish the intended code.
+- **Database:** the Node.js data services connect to MongoDB Atlas using environment configuration.
+
+The gateway is an application running on EC2, not the managed Amazon API Gateway service.
+
+## 1. Prepare AWS and Jenkins
+
+Before running a pipeline:
+
+1. Create the Jenkins EC2 host in the default VPC. Attach a least-privilege IAM instance profile for the AWS resources and actions the jobs require; avoid long-lived AWS access keys on the host.
+2. Install and verify the tools used by the jobs: Jenkins, Git, AWS CLI, Node.js/npm, Terraform, Ansible, and SSH utilities.
+3. Configure Jenkins credentials for the EC2 SSH private key and any application/database secrets. The configuration pipeline expects an SSH credential; do not put private keys, passwords, or tokens in Jenkinsfiles or the repository.
+4. Create the Terraform state bucket expected by `shopitry-infrastructure-terraform/backend.tf` before the first `terraform init`. Enable encryption and versioning, and allow the Jenkins role to access the state and S3 lock file.
+5. Confirm the Jenkins host can reach the application VPC over the configured VPC peering connection and can SSH to the application instances using the intended private IPs.
+
+## 2. Prepare DNS, certificates, and Terraform inputs
+
+1. Create a Route 53 hosted zone for the domain and delegate its assigned name servers at the domain registrar.
+2. Request and validate ACM certificates for the frontend names and API name. CloudFront requires its ACM certificate in `us-east-1`; the current Terraform uses the certificate ARN for both CloudFront and the load balancer, so confirm that it is usable in the configured AWS region and covers the configured names.
+3. Review `shopitry-infrastructure-terraform/terraform.tfvars.example` and replace all example/environment-specific values, including region, domain names, bucket names, instance settings, subnets, and service addresses.
+4. Review the infrastructure Jenkinsfile before use. It copies `terraform.tfvars.example` to `terraform.tfvars` in the workspace and supplies several additional Terraform variables from the Jenkinsfile. The checked-in example contains values that must be validated for your environment. Keep populated `terraform.tfvars` out of source control.
+5. Route 53 records and ACM certificate requests are not created by the Terraform modules in this repository; plan to configure them separately.
+
+## 3. Provision infrastructure
+
+Run `jenkinsfiles/infra-jenkinsfile/Jenkinsfile` from a Jenkins pipeline. Its stages:
+
+1. Check out the repository.
+2. Prepare `terraform.tfvars`.
+3. Run `terraform init` and `terraform validate`.
+4. Generate a Terraform plan.
+5. Pause for approval.
+6. Apply the approved plan.
+
+Review the plan carefully before approval, especially networking, public ingress, IAM policies, Lambda Function URL access, and any resource replacement. Use the Terraform outputs to retrieve the VPC/subnet IDs, service IPs, load balancer details, Lambda URLs, S3 bucket names, and CloudFront distribution details needed by later steps.
+
+## 4. Configure EC2 instances
+
+After infrastructure is available:
+
+1. Update `ansible/inventory/inventory.ini` with the actual private addresses for the gateway, catalog, cart, and order instances.
+2. Run `jenkinsfiles/configuration-jenkinsfile/config.Jenkinsfile`.
+3. The job checks SSH connectivity, checks the Ansible playbook syntax, and runs `ansible/playbooks/bootstrap.yaml`. The playbook applies the roles for Node.js/PM2 and the gateway, catalog, cart, and order applications.
+4. Verify that the SSH user, private key, Python interpreter, security groups, routes, and host addresses are correct if connectivity fails.
+
+## 5. Deploy application components
+
+Run the matching pipeline under `jenkinsfiles/app-deployment/` for each component:
+
+| Component | Jenkinsfile |
+| --- | --- |
+| Gateway | `gateway-service-deploy.Jenkinsfile` |
+| Catalog | `catalog-deploy.Jenkinsfile` |
+| Cart | `cart-deploy.Jenkinsfile` |
+| Orders | `order-deploy.Jenkinsfile` |
+| Payment function | `payment-service-deploy.Jenkinsfile` |
+| Notification function | `notification-service-deploy.Jenkinsfile` |
+| Storefront | `storefront-frontend-deploy.Jenkinsfile` |
+| Admin dashboard | `admin-frontend-deploy.Jenkinsfile` |
+
+Set service URLs, database URIs, JWT settings, function URLs, and frontend API settings through the appropriate Jenkins credentials or deployment environment configuration. Do not copy production values into source files. Confirm the Lambda deployment pipelines replace the placeholder code provisioned by Terraform.
+
+## 6. Configure DNS and verify
+
+After deployments complete:
+
+1. Create DNS aliases/records for the storefront and admin CloudFront distributions.
+2. Create the API DNS record pointing to the Application Load Balancer.
+3. Wait for DNS and certificate validation/propagation.
+4. Test the storefront and admin pages over HTTPS, then test the API health endpoint and representative catalog, cart, and order operations.
+5. Check Jenkins build logs, EC2 service/process health, Lambda logs, and load balancer target health. Avoid placing secret values in build logs.
+
+## Operational and security notes
+
+- The Lambda Function URLs in the current Terraform code use `authorization_type = "NONE"` and allow public invocation. Restrict or add application-level authorization before production use.
+- Review security group rules and IAM permissions for least privilege. Ensure private service ports are not publicly reachable.
+- Protect Terraform state as sensitive data. Use a separate backend/state key per environment and do not commit generated state or `terraform.tfvars`.
+- The current infrastructure Jenkinsfile contains environment-specific resource values. Prefer managed Jenkins parameters for non-secret configuration and Jenkins credentials for secrets.
+- A destroy pipeline is present in `jenkinsfiles/infra-jenkinsfile/destroy-infra.Jenkinsfile`. Treat it as destructive: verify the AWS account, workspace, state, and plan before approving any destroy operation.
+- A previous version of this guide included database credentials. Those values have been removed from the current file, but removing them here does not erase Git history. Rotate any credentials that may have been committed and review repository history.
